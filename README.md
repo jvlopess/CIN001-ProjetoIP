@@ -66,11 +66,11 @@ Uma breve descrição do projeto, explicando o objetivo do jogo e as principais 
 ## 5. 🧑‍💻 Divisão de Trabalho
 
 ### 5.1. Tarefas e Responsáveis
-- **Nome do Membro 1**: ''
-- **Nome do Membro 2**: ''
-- **Nome do Membro 3**: ''
-- **Nome do Membro 4**: ''
-- **Nome do Membro 5**: ''
+- **Nome do Membro 1**: 'Andreywid Souza'
+- **Nome do Membro 2**: 'Jadiael Gadelha'
+- **Nome do Membro 3**: 'João Victor Lopes'
+- **Nome do Membro 4**: 'Mário Teles'
+- **Nome do Membro 5**: 'Victor Diniz'
 
 ## 6. 🧠 Conceitos Utilizados
 
@@ -103,5 +103,46 @@ Uma breve descrição do projeto, explicando o objetivo do jogo e as principais 
 - **Trabalho em Equipe**: Como trabalhar em equipe, dividindo tarefas e integrando diferentes partes do código.
 - **Conhecimento Técnico**: Melhor entendimento de Pygame e dos conceitos de OOP.
 
+# Guidelines de Contribuição
+
+## Mensagens de Commit
+
+Utilizamos uma convenção que fornece um conjunto de regras para formular uma estrutura de mensagem de commit consistente da seguinte forma:
+
+```
+<type>[optional scope]: <description>
+
+[optional body]
+```
+
+O tipo do commit pode ser:
+
+- `feat` – uma nova funcionalidade é introduzida com as mudanças.
+- `fix` – ocorreu uma correção de bug.
+- `refactor` – código refatorado que não corrige um bug nem adiciona uma funcionalidade.
+- `docs` – atualizações na documentação, como o README ou outros arquivos markdown.
+- `style` – mudanças que não afetam o significado do código, provavelmente relacionadas à formatação do código, como espaços em branco, pontos e vírgulas ausentes, e assim por diante.
+
+A linha de assunto do tipo de commit deve ser toda em letras minúsculas com um limite de 75 caracteres. Além disso, o corpo opcional do commit deve ser usado para fornecer mais detalhes que não cabem nas limitações de caracteres da descrição da linha de assunto.
+
+## Criação de Branches
+
+Uma branch do git deve começar com uma categoria. Escolha uma destas: `feature`, `bugfix`, ou `test`.
+
+- `feature` é para adicionar, refatorar ou remover uma funcionalidade.
+- `bugfix` é para corrigir um bug.
+- `test` é para experimentação.
+
+Após a categoria, deve haver um "/" seguido por uma descrição que resume o propósito desta branch específica. Esta descrição deve ser curta e em `kebab-case`. Para resumir, siga este padrão ao criar branches:
+
+```
+git branch <category/description-in-kebab-case>
+```
+
+Exemplos:
+
+- Você precisa adicionar, refatorar ou remover uma funcionalidade: `git branch feature/create-new-button-component`
+- Você precisa corrigir um bug: `git branch bugfix/button-overlap-form-on-mobile`
+- Você precisa experimentar algo: `git branch test/refactor-components-with-atomic-design`
 
 
