@@ -1,16 +1,21 @@
-import pygame
+import pygame  
 
-LARGURA = 1920
-ALTURA = 1080
-FPS = 60
-ESCALA = 2 # escala recomendada = 2
-TILESIZE = 16 * ESCALA
+# Valores recomendados
+LARGURA = 1280          # 1280
+ALTURA = 720            # 720
+FPS = 60                # 60
+ESCALA = 2              # 2
+TILESIZE = 16 * ESCALA  # 16 * ESCALA
 
 class Player(pygame.sprite.Sprite):
+
+    # Construtor
     def __init__(self, pos, groups, sprites_obstaculos):
         super().__init__(groups)
         
-        # A imagem de todas as possiveis posições do player (spritesheet)
+        # Parâmetros iniciais
+        self.current_direction = 'idle_down'
+        self.current_frame = 0
         self.full_image = pygame.image.load("../assets/gameplay/Personagem.png").convert_alpha()
         
         # Definir as coordenadas dos sprites
@@ -34,18 +39,14 @@ class Player(pygame.sprite.Sprite):
             'run_down_right': [(96, 32), (224, 32)]
         }
 
-        self.current_direction = 'idle_down'
-        self.current_frame = 0
-        self.image = self.get_sprite(self.current_direction, self.current_frame)
 
+        self.image = self.get_sprite(self.current_direction, self.current_frame)
         self.rect = self.image.get_rect(topleft=pos)
         self.hitbox = self.rect.inflate(0, 0)  # Realizar a mudança do hitbox pela img (para não ocorrer bugs)
-
         self.direction = pygame.math.Vector2()
         
-        # Velocidade do player
-        self.speed = 2 * ESCALA
-
+        # Velocidade do jogador
+        self.speed = 1.25 * ESCALA
         self.sprites_obstaculos = sprites_obstaculos
 
         # Timer para animação
@@ -53,14 +54,15 @@ class Player(pygame.sprite.Sprite):
         self.animation_speed = 0.1
         self.current_time = 0
         
-    # Função para pegar o sprite correto
+    # Selecionar sprite
     def get_sprite(self, action, frame):
         x, y = self.sprite_player_positions[action][frame]
         sprite = self.full_image.subsurface(pygame.Rect(x, y, 16, 16))
         sprite = pygame.transform.scale(sprite, (sprite.get_width() * ESCALA, sprite.get_height() * ESCALA))
         return sprite
     
-    def input(self):
+    # Receber entrada
+    def get_input(self):
         keys = pygame.key.get_pressed()
 
         if keys[pygame.K_w]:
@@ -114,19 +116,21 @@ class Player(pygame.sprite.Sprite):
             elif 'right' in self.current_direction:
                 self.current_direction = 'idle_right'
 
-        # Atualizar a animação
         self.image = self.get_sprite(self.current_direction, self.current_frame)
     
+    # Alternar sprite
     def update_animation(self):
         self.current_time += self.animation_speed
         if self.current_time >= self.animation_time:
             self.current_time = 0
+            
             # Alternar entre os dois frames disponíveis
             self.current_frame = (self.current_frame + 1) % 2
             self.image = self.get_sprite(self.current_direction, self.current_frame)
     
+    # Movimentar jogador
     def move(self, speed):
-        if self.direction.magnitude() != 0: #caso o player vá em alguma direção AS, AD, WA ou WD, a velocidade não seja maior do que devia.
+        if self.direction.magnitude() != 0: #caso o jogador vá em alguma direção AS, AD, WA ou WD, a velocidade não seja maior do que devia.
             self.direction = self.direction.normalize()
 
         self.hitbox.x += self.direction.x * speed
@@ -135,7 +139,7 @@ class Player(pygame.sprite.Sprite):
         self.collision('vertical')
         self.rect.center = self.hitbox.center
 
-        # Limitar a movimentação do player para dentro da tela
+        # Limitar a movimentação do jogador para dentro da tela
         if self.hitbox.left < 0:
             self.hitbox.left = 0
         if self.hitbox.right > LARGURA:
@@ -145,6 +149,7 @@ class Player(pygame.sprite.Sprite):
         if self.hitbox.bottom > ALTURA:
             self.hitbox.bottom = ALTURA
 
+    # Aplicar colisão com as paredes
     def collision(self, direction):
         if direction == 'horizontal':
             for sprite in self.sprites_obstaculos:
@@ -161,7 +166,8 @@ class Player(pygame.sprite.Sprite):
                     if self.direction.y < 0:
                         self.hitbox.top = sprite.hitbox.bottom
 
+    # Atualizar jogador
     def update(self):
-        self.input()
+        self.get_input()
         self.move(self.speed)
         self.update_animation()
