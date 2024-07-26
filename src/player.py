@@ -65,32 +65,32 @@ class Player(pygame.sprite.Sprite):
     def get_input(self):
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_w]:
+        if keys[pygame.K_w] or keys[pygame.K_UP]:
             self.direction.y = -1
-            if keys[pygame.K_a]:
+            if keys[pygame.K_a] or keys[pygame.K_LEFT]:
                 self.current_direction = 'run_up_left'
-            elif keys[pygame.K_d]:
+            elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
                 self.current_direction = 'run_up_right'
             else:
                 self.current_direction = 'run_up'
-        elif keys[pygame.K_s]:
+        elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
             self.direction.y = 1
-            if keys[pygame.K_a]:
+            if keys[pygame.K_a] or keys[pygame.K_LEFT]:
                 self.current_direction = 'run_down_left'
-            elif keys[pygame.K_d]:
+            elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
                 self.current_direction = 'run_down_right'
             else:
                 self.current_direction = 'run_down'
         else:
             self.direction.y = 0
 
-        if keys[pygame.K_a]:
+        if keys[pygame.K_a] or keys[pygame.K_LEFT]:
             self.direction.x = -1
-            if not keys[pygame.K_w] and not keys[pygame.K_s]:
+            if not (keys[pygame.K_w] or keys[pygame.K_UP]) and not (keys[pygame.K_s] or keys[pygame.K_DOWN]):
                 self.current_direction = 'run_left'
-        elif keys[pygame.K_d]:
+        elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
             self.direction.x = 1
-            if not keys[pygame.K_w] and not keys[pygame.K_s]:
+            if not (keys[pygame.K_w] or keys[pygame.K_UP]) and not (keys[pygame.K_s] or keys[pygame.K_DOWN]):
                 self.current_direction = 'run_right'
         else:
             self.direction.x = 0
@@ -139,7 +139,7 @@ class Player(pygame.sprite.Sprite):
         self.collision('vertical')
         self.rect.center = self.hitbox.center
 
-        # Limitar a movimentação do jogador para dentro da tela
+        # Limites do mapa
         if self.hitbox.left < 0:
             self.hitbox.left = 0
         if self.hitbox.right > LARGURA:
@@ -149,7 +149,7 @@ class Player(pygame.sprite.Sprite):
         if self.hitbox.bottom > ALTURA:
             self.hitbox.bottom = ALTURA
 
-    # Aplicar colisão com as paredes
+    # Aplicar colisão
     def collision(self, direction):
         if direction == 'horizontal':
             for sprite in self.sprites_obstaculos:
