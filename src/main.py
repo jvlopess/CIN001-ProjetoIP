@@ -1,36 +1,39 @@
 import pygame
-from player import Player
+import sys
+from level import Level
 
-# Inicializar tela
-pygame.init()
-screen = pygame.display.set_mode((1280, 720))
-pygame.display.set_caption("nome-do-jogo")
-running = True
-clock = pygame.time.Clock()
+LARGURA = 1280          # 1280
+ALTURA = 720            # 720
+FPS = 60                # 60
+ESCALA = 2              # 2
+TILESIZE = 16 * ESCALA  # 16 * ESCALA
 
-# Sprites e obstáculos
-all_sprites = pygame.sprite.Group()
-obstaculos = pygame.sprite.Group()  # Adicione sprites de obstáculos se necessário
+class Game:
+    def __init__(self):
+        
+        pygame.init()
+        self.screen = pygame.display.set_mode((LARGURA, ALTURA), pygame.FULLSCREEN)
+        pygame.display.set_caption('Projeto IP')
+        self.clock = pygame.time.Clock()
+        
+        self.level = Level()
 
-# Jogador
-player_pos = (400, 300)
-player = Player(pos=player_pos, groups=all_sprites, sprites_obstaculos=obstaculos)
+    def run(self):
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.quit()
+                        sys.exit()
+                        
+            self.screen.fill('white')
+            self.level.run()
+            pygame.display.update()
+            self.clock.tick(FPS)
 
-# Inicializar Jogo
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-
-    # Atualizar sprites
-    all_sprites.update()
-
-    # Desenhar sprites
-    screen.fill("white")
-    all_sprites.draw(screen)
-    pygame.display.flip()
-
-    # FPS
-    clock.tick(60)
-
-pygame.quit()
+if __name__ == '__main__':
+    game = Game()
+    game.run()

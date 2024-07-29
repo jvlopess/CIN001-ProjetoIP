@@ -1,6 +1,5 @@
-import pygame  
+import pygame
 
-# Valores recomendados
 LARGURA = 1280          # 1280
 ALTURA = 720            # 720
 FPS = 60                # 60
@@ -8,14 +7,10 @@ ESCALA = 2              # 2
 TILESIZE = 16 * ESCALA  # 16 * ESCALA
 
 class Player(pygame.sprite.Sprite):
-
-    # Construtor
     def __init__(self, pos, groups, sprites_obstaculos):
         super().__init__(groups)
         
-        # Parâmetros iniciais
-        self.current_direction = 'idle_down'
-        self.current_frame = 0
+        # A imagem de todas as possiveis posições do player (spritesheet)
         self.full_image = pygame.image.load("../assets/gameplay/Personagem.png").convert_alpha()
         
         # Definir as coordenadas dos sprites
@@ -39,14 +34,18 @@ class Player(pygame.sprite.Sprite):
             'run_down_right': [(96, 32), (224, 32)]
         }
 
-
+        self.current_direction = 'idle_down'
+        self.current_frame = 0
         self.image = self.get_sprite(self.current_direction, self.current_frame)
+
         self.rect = self.image.get_rect(topleft=pos)
         self.hitbox = self.rect.inflate(0, 0)  # Realizar a mudança do hitbox pela img (para não ocorrer bugs)
+
         self.direction = pygame.math.Vector2()
         
-        # Velocidade do jogador
-        self.speed = 1.25 * ESCALA
+        # Velocidade do player
+        self.speed = 2 * ESCALA
+
         self.sprites_obstaculos = sprites_obstaculos
 
         # Timer para animação
@@ -54,43 +53,42 @@ class Player(pygame.sprite.Sprite):
         self.animation_speed = 0.1
         self.current_time = 0
         
-    # Selecionar sprite
+    # Função para pegar o sprite correto
     def get_sprite(self, action, frame):
         x, y = self.sprite_player_positions[action][frame]
         sprite = self.full_image.subsurface(pygame.Rect(x, y, 16, 16))
         sprite = pygame.transform.scale(sprite, (sprite.get_width() * ESCALA, sprite.get_height() * ESCALA))
         return sprite
     
-    # Receber entrada
-    def get_input(self):
+    def input(self):
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_w] or keys[pygame.K_UP]:
+        if keys[pygame.K_w]:
             self.direction.y = -1
-            if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+            if keys[pygame.K_a]:
                 self.current_direction = 'run_up_left'
-            elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+            elif keys[pygame.K_d]:
                 self.current_direction = 'run_up_right'
             else:
                 self.current_direction = 'run_up'
-        elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
+        elif keys[pygame.K_s]:
             self.direction.y = 1
-            if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+            if keys[pygame.K_a]:
                 self.current_direction = 'run_down_left'
-            elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+            elif keys[pygame.K_d]:
                 self.current_direction = 'run_down_right'
             else:
                 self.current_direction = 'run_down'
         else:
             self.direction.y = 0
 
-        if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+        if keys[pygame.K_a]:
             self.direction.x = -1
-            if not (keys[pygame.K_w] or keys[pygame.K_UP]) and not (keys[pygame.K_s] or keys[pygame.K_DOWN]):
+            if not keys[pygame.K_w] and not keys[pygame.K_s]:
                 self.current_direction = 'run_left'
-        elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+        elif keys[pygame.K_d]:
             self.direction.x = 1
-            if not (keys[pygame.K_w] or keys[pygame.K_UP]) and not (keys[pygame.K_s] or keys[pygame.K_DOWN]):
+            if not keys[pygame.K_w] and not keys[pygame.K_s]:
                 self.current_direction = 'run_right'
         else:
             self.direction.x = 0
@@ -116,21 +114,19 @@ class Player(pygame.sprite.Sprite):
             elif 'right' in self.current_direction:
                 self.current_direction = 'idle_right'
 
+        # Atualizar a animação
         self.image = self.get_sprite(self.current_direction, self.current_frame)
     
-    # Alternar sprite
     def update_animation(self):
         self.current_time += self.animation_speed
         if self.current_time >= self.animation_time:
             self.current_time = 0
-            
             # Alternar entre os dois frames disponíveis
             self.current_frame = (self.current_frame + 1) % 2
             self.image = self.get_sprite(self.current_direction, self.current_frame)
     
-    # Movimentar jogador
     def move(self, speed):
-        if self.direction.magnitude() != 0: #caso o jogador vá em alguma direção AS, AD, WA ou WD, a velocidade não seja maior do que devia.
+        if self.direction.magnitude() != 0: #caso o player vá em alguma direção AS, AD, WA ou WD, a velocidade não seja maior do que devia.
             self.direction = self.direction.normalize()
 
         self.hitbox.x += self.direction.x * speed
@@ -139,17 +135,6 @@ class Player(pygame.sprite.Sprite):
         self.collision('vertical')
         self.rect.center = self.hitbox.center
 
-        # Limites do mapa
-        if self.hitbox.left < 0:
-            self.hitbox.left = 0
-        if self.hitbox.right > LARGURA:
-            self.hitbox.right = LARGURA
-        if self.hitbox.top < 0:
-            self.hitbox.top = 0
-        if self.hitbox.bottom > ALTURA:
-            self.hitbox.bottom = ALTURA
-
-    # Aplicar colisão
     def collision(self, direction):
         if direction == 'horizontal':
             for sprite in self.sprites_obstaculos:
@@ -166,8 +151,7 @@ class Player(pygame.sprite.Sprite):
                     if self.direction.y < 0:
                         self.hitbox.top = sprite.hitbox.bottom
 
-    # Atualizar jogador
     def update(self):
-        self.get_input()
+        self.input()
         self.move(self.speed)
         self.update_animation()
