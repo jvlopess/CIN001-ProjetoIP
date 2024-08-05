@@ -9,7 +9,6 @@ TILESIZE = 16 * ESCALA  # 16 * ESCALA
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, groups, sprites_obstaculos):
         super().__init__(groups)
-        
         # A imagem de todas as possiveis posições do player (spritesheet)
         self.full_image = pygame.image.load("../assets/gameplay/Personagem.png").convert_alpha()
         

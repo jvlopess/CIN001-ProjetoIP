@@ -24,6 +24,7 @@ class Collectible(pygame.sprite.Sprite):
     def __init__(self, pos, groups, sprite):
         super().__init__(groups)
         self.image = sprite
+        self.image = pygame.transform.scale(self.image, (self.image.get_width() * ESCALA, self.image.get_height() * ESCALA))
         self.rect = self.image.get_rect(topleft=pos)
         self.hitbox = self.rect.inflate(0, 0)
 
@@ -69,10 +70,13 @@ class Level:
         self.sprites_abaixo_do_player = pygame.sprite.Group()
         self.collectibles = pygame.sprite.Group()
         self.player = Player((600 * ESCALA, 1520 * ESCALA), [self.sprites_visiveis], self.sprites_obstaculos)
-        #self.enemy = Enemy((640 * ESCALA, 1520 * ESCALA), [self.sprites_visiveis], self.sprites_obstaculos, self.player)
+        self.enemy = Enemy((640 * ESCALA, 1520 * ESCALA), [self.sprites_visiveis], self.sprites_obstaculos, self.player)
 
         self.create_map()
         self.load_collectibles()
+
+    def get_player_position(self):
+        return self.player.x, self.player.y
 
     def get_sprite(self, action):
         x, y = self.sprite_positions[action]
@@ -630,13 +634,13 @@ class Level:
         ]
         full_card = pieces_image.subsurface(pygame.Rect(0, 0, 16, 16))
 
-        # Definir posições iniciais dos pedaços do cartão
-        positions = [(choice(range(1, 20)) * TILESIZE, choice(range(1, 15)) * TILESIZE) for _ in range(3)]
+        # Definir posições fixas dos pedaços do cartão
+        positions = [(150, 490), (2021, 1261), (2142, 3294)]
 
         for i, pos in enumerate(positions):
             Collectible(pos, [self.sprites_visiveis, self.collectibles], pieces[i])
 
-        self.full_card = Collectible((0, 0), [self.sprites_visiveis], full_card)  # Posicionamento inicial fora da tela
+        self.full_card = Collectible((1136, 2380), [self.sprites_visiveis], full_card)
         self.full_card.kill()  # Esconder o cartão completo inicialmente
 
     def check_collectibles(self):
@@ -645,4 +649,4 @@ class Level:
             if len(self.collectibles) == 0:
                 # Todos os pedaços coletados, mostrar o cartão completo
                 self.full_card.add(self.sprites_visiveis)
-                self.full_card.rect.topleft = (choice(range(1, 20)) * TILESIZE, choice(range(1, 15)) * TILESIZE)
+                self.full_card.rect.topleft = (1136, 2380)

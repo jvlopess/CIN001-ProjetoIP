@@ -16,18 +16,22 @@ class Enemy(pygame.sprite.Sprite):
         # Definir as coordenadas dos sprites
         # Cada ação tem dois frames, um para cada direção
         self.sprite_enemy_positions = {
-            'idle_up': [(16, 0), (48, 0)],
-            'idle_down': [(16, 32), (48, 32)],
-            'idle_left': [(16, 64), (48, 64)],
-            'idle_right': [(16, 96), (48, 96)],
-            'run_up': [(80, 0), (112, 0)],
-            'run_down': [(80, 32), (112, 32)],
-            'run_left': [(80, 64), (112, 64)],
-            'run_right': [(80, 96), (112, 96)],
+            'idle_up': [(16, 0), (144, 0)],
+            'idle_down': [(16, 32), (144, 32)],
+            'idle_left': [(0, 16), (128, 16)],
+            'idle_right': [(32, 16), (160, 16)],
+            'idle_up_left': [(0, 0), (128, 0)],
+            'idle_up_right': [(32, 0), (160, 0)],
+            'idle_down_left': [(0, 32), (128, 32)],
+            'idle_down_right': [(32, 32), (160, 32)],
+            'run_up': [(80, 0), (208, 0)],
+            'run_down': [(80, 32), (208, 32)],
+            'run_left': [(64, 16), (192, 16)],
+            'run_right': [(96, 16), (224, 16)],
             'run_up_left': [(64, 0), (192, 0)],
             'run_up_right': [(96, 0), (224, 0)],
             'run_down_left': [(64, 32), (192, 32)],
-            'run_down_right': [(96, 32), (224, 32)],
+            'run_down_right': [(96, 32), (224, 32)]
         }
 
         self.current_direction = 'idle_down'
