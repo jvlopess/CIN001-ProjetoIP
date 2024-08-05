@@ -1,16 +1,17 @@
 import pygame
 from tile import Tile
 from player import Player
+from enemy import Enemy
+from random import choice
 from csv import reader
 
 def import_csv_layout(path):
     mapa = []
     with open(path) as level_map:
-        layout = reader(level_map, delimiter = ',')
+        layout = reader(level_map, delimiter=',')
         for row in layout:
             mapa.append(list(row))
-        return mapa
-    
+    return mapa
 
 # Valores recomendados
 LARGURA = 1280          # 1280
@@ -19,6 +20,46 @@ FPS = 60                # 60
 ESCALA = 2              # 2
 TILESIZE = 16 * ESCALA  # 16 * ESCALA
 
+class Collectible(pygame.sprite.Sprite):
+    def __init__(self, pos, groups, sprite):
+        super().__init__(groups)
+        self.image = sprite
+        self.rect = self.image.get_rect(topleft=pos)
+        self.hitbox = self.rect.inflate(0, 0)
+
+class CameraGroup(pygame.sprite.Group):
+    def __init__(self, sprites_acima_do_player):
+        super().__init__()
+        self.display_surface = pygame.display.get_surface()
+        self.half_width = self.display_surface.get_size()[0] // 2
+        self.half_height = self.display_surface.get_size()[1] // 2
+        self.offset = pygame.math.Vector2()
+
+        self.sprites_acima_do_player = sprites_acima_do_player
+
+        # criando o Piso utilizando a imagem do tilemap
+        self.floor_surf = pygame.image.load('../assets/tilemap/Piso.png').convert()
+        self.floor_surf = pygame.transform.scale(self.floor_surf, (self.floor_surf.get_width() * ESCALA, self.floor_surf.get_height() * ESCALA))
+        self.floor_rect = self.floor_surf.get_rect(topleft=(0, 0))
+    
+    def drawn(self, player):
+        self.offset.x = player.rect.centerx - self.half_width
+        self.offset.y = player.rect.centery - self.half_height
+
+        # Desenhando o Piso z
+        floor_offset_pos = self.floor_rect.topleft - self.offset
+        self.display_surface.blit(self.floor_surf, floor_offset_pos)
+
+        # Desenhando todos os sprites na ordem de sua posição Y
+        for sprite in sorted(self.sprites(), key=lambda sprite: sprite.rect.centery):
+            offset_pos = sprite.rect.topleft - self.offset
+            self.display_surface.blit(sprite.image, offset_pos)
+
+        # Desenhando os sprites acima do player
+        for sprite in self.sprites_acima_do_player:
+            offset_pos = sprite.rect.topleft - self.offset
+            self.display_surface.blit(sprite.image, offset_pos)
+
 class Level:
     def __init__(self):
         self.display_surface = pygame.display.get_surface()
@@ -26,9 +67,12 @@ class Level:
         self.sprites_visiveis = CameraGroup(self.sprites_acima_do_player)
         self.sprites_obstaculos = pygame.sprite.Group()
         self.sprites_abaixo_do_player = pygame.sprite.Group()
+        self.collectibles = pygame.sprite.Group()
         self.player = Player((600 * ESCALA, 1520 * ESCALA), [self.sprites_visiveis], self.sprites_obstaculos)
+        #self.enemy = Enemy((640 * ESCALA, 1520 * ESCALA), [self.sprites_visiveis], self.sprites_obstaculos, self.player)
 
         self.create_map()
+        self.load_collectibles()
 
     def get_sprite(self, action):
         x, y = self.sprite_positions[action]
@@ -40,6 +84,7 @@ class Level:
         # Atualiza e desenha o jogo
         self.sprites_visiveis.drawn(self.player)
         self.sprites_visiveis.update()
+        self.check_collectibles()
 
     def create_map(self):
 
@@ -576,35 +621,28 @@ class Level:
                                 objeto_sprite = self.get_sprite('porta_madeira_direita_baixo')
                                 Tile((x, y), [self.sprites_visiveis, self.sprites_obstaculos], objeto_sprite)
 
-class CameraGroup(pygame.sprite.Group):
-    def __init__(self, sprites_acima_do_player):
-        super().__init__()
-        self.display_surface = pygame.display.get_surface()
-        self.half_width = self.display_surface.get_size()[0] // 2
-        self.half_height = self.display_surface.get_size()[1] // 2
-        self.offset = pygame.math.Vector2()
+    def load_collectibles(self):
+        pieces_image = pygame.image.load("../assets/gameplay/Cartao.png").convert_alpha()
+        pieces = [
+            pieces_image.subsurface(pygame.Rect(16, 16, 16, 16)),
+            pieces_image.subsurface(pygame.Rect(16, 0, 16, 16)),
+            pieces_image.subsurface(pygame.Rect(0, 16, 16, 16)),
+        ]
+        full_card = pieces_image.subsurface(pygame.Rect(0, 0, 16, 16))
 
-        self.sprites_acima_do_player = sprites_acima_do_player
+        # Definir posições iniciais dos pedaços do cartão
+        positions = [(choice(range(1, 20)) * TILESIZE, choice(range(1, 15)) * TILESIZE) for _ in range(3)]
 
-        # criando o Piso utilizando a imagem do tilemap
-        self.floor_surf = pygame.image.load('../assets/tilemap/Piso.png').convert()
-        self.floor_surf = pygame.transform.scale(self.floor_surf, (self.floor_surf.get_width() * ESCALA, self.floor_surf.get_height() * ESCALA))
-        self.floor_rect = self.floor_surf.get_rect(topleft=(0, 0))
-    
-    def drawn(self, player):
-        self.offset.x = player.rect.centerx - self.half_width
-        self.offset.y = player.rect.centery - self.half_height
+        for i, pos in enumerate(positions):
+            Collectible(pos, [self.sprites_visiveis, self.collectibles], pieces[i])
 
-        # Desenhando o Piso z
-        floor_offset_pos = self.floor_rect.topleft - self.offset
-        self.display_surface.blit(self.floor_surf, floor_offset_pos)
+        self.full_card = Collectible((0, 0), [self.sprites_visiveis], full_card)  # Posicionamento inicial fora da tela
+        self.full_card.kill()  # Esconder o cartão completo inicialmente
 
-        # Desenhando todos os sprites na ordem de sua posição Y
-        for sprite in sorted(self.sprites(), key=lambda sprite: sprite.rect.centery):
-            offset_pos = sprite.rect.topleft - self.offset
-            self.display_surface.blit(sprite.image, offset_pos)
-
-        # Desenhando os sprites acima do player
-        for sprite in self.sprites_acima_do_player:
-            offset_pos = sprite.rect.topleft - self.offset
-            self.display_surface.blit(sprite.image, offset_pos)
+    def check_collectibles(self):
+        collected = pygame.sprite.spritecollide(self.player, self.collectibles, True)
+        if collected:
+            if len(self.collectibles) == 0:
+                # Todos os pedaços coletados, mostrar o cartão completo
+                self.full_card.add(self.sprites_visiveis)
+                self.full_card.rect.topleft = (choice(range(1, 20)) * TILESIZE, choice(range(1, 15)) * TILESIZE)
