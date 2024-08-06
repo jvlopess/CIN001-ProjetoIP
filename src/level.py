@@ -95,6 +95,8 @@ class Level:
         self.sprites_obstaculos = pygame.sprite.Group()
         self.sprites_abaixo_do_player = pygame.sprite.Group()
         self.collectibles = pygame.sprite.Group()
+        self.drinks = pygame.sprite.Group()
+        self.food = pygame.sprite.Group()
         self.player = Player((600 * ESCALA, 1520 * ESCALA), [self.sprites_visiveis], self.sprites_obstaculos)
         self.enemy = Enemy((640 * ESCALA, 1520 * ESCALA), [self.sprites_visiveis], self.sprites_obstaculos, self.player)
 
@@ -664,18 +666,34 @@ class Level:
 
                                 
     def load_collectibles(self):
-        pieces_image = pygame.image.load("../assets/gameplay/Cartao.png").convert_alpha()
+        pieces_image = pygame.image.load("../assets/gameplay/Cartao.png").convert_alpha() #cartão do cin
+        soda_image = pygame.image.load("../assets/gameplay/Energydrink.png").convert_alpha().subsurface(pygame.Rect(0, 0, 16, 16)) #power up de aumentar velocidade
+        food_image = pygame.image.load("../assets/gameplay/Burguer.png").convert_alpha().subsurface(pygame.Rect(0, 0, 16, 16))
+
+        full_card = pieces_image.subsurface(pygame.Rect(0, 0, 16, 16))
+
         pieces = [
             pieces_image.subsurface(pygame.Rect(16, 16, 16, 16)),
             pieces_image.subsurface(pygame.Rect(16, 0, 16, 16)),
-            pieces_image.subsurface(pygame.Rect(0, 16, 16, 16)),
+            pieces_image.subsurface(pygame.Rect(0, 16, 16, 16))
         ]
-        full_card = pieces_image.subsurface(pygame.Rect(0, 0, 16, 16))
 
         # Definir posições fixas dos pedaços do cartão
-        positions = [(150, 490), (2021, 1261), (2142, 3294)]
+        positions_pc = [(150, 490), (2021, 1261), (2142, 3294)]
+        
+        # Definir posições fixas dos refrigerantes
+        positions_ed = [(200, 1600), (1000, 3200), (500, 1070), (1800, 750)]
 
-        for i, pos in enumerate(positions):
+        # Definir posições fixas dos hamburgueres
+        positions_food = [(125, 1535), (750, 250)]
+
+        for pos in positions_food:
+            Collectible(pos, [self.sprites_visiveis, self.food], food_image)
+
+        for pos in positions_ed:
+            Collectible(pos, [self.sprites_visiveis, self.drinks], soda_image)
+        
+        for i, pos in enumerate(positions_pc):
             Collectible(pos, [self.sprites_visiveis, self.collectibles], pieces[i])
 
         self.full_card = Collectible((1136, 2380), [self.sprites_visiveis], full_card)
@@ -683,12 +701,17 @@ class Level:
 
     def check_collectibles(self):
         global full_card_collected
-        collected = pygame.sprite.spritecollide(self.player, self.collectibles, True)
-        if collected:
-            if len(self.collectibles) == 0:
-                # Todos os pedaços coletados, mostrar o cartão completo
-                self.full_card.add(self.sprites_visiveis)
-                self.full_card.rect.topleft = (1136, 2380)
+        piece_collected = pygame.sprite.spritecollide(self.player, self.collectibles, True)
+        drink_collected = pygame.sprite.spritecollide(self.player, self.drinks, True)
+        food_collected = pygame.sprite.spritecollide(self.player, self.food, True)
+
+        if drink_collected:
+            self.player.speed += 1
+        
+        if piece_collected and len(self.collectibles) == 0:
+            # Todos os pedaços coletados, mostrar o cartão completo
+            self.full_card.add(self.sprites_visiveis)
+            self.full_card.rect.topleft = (1136, 2380)
         
         # Verificar colisão com o cartão completo
         if self.full_card in self.sprites_visiveis and pygame.sprite.collide_rect(self.player, self.full_card):
