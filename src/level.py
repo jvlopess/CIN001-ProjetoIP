@@ -5,31 +5,9 @@ from enemy import Enemy
 from random import choice
 from csv import reader
 import sys
+from settings import *
 
 full_card_collected = False
-
-
-def display_win_screen():
-    pygame.init()
-    screen = pygame.display.set_mode((LARGURA, ALTURA))
-    font = pygame.font.Font(None, 74)
-    text = font.render("WIN", True, (255, 255, 255))
-    text_rect = text.get_rect(center=(LARGURA // 2, ALTURA // 2))
-    
-    while True:
-        screen.fill((0, 0, 0))
-        screen.blit(text, text_rect)
-        pygame.display.flip()
-        
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    pygame.quit()
-                    sys.exit()
-
 
 def import_csv_layout(path):
     mapa = []
@@ -109,6 +87,21 @@ class Level:
         self.create_map()
         self.load_collectibles()
 
+        self.collected_items = {
+            'pieces': 0,
+            'drinks': 0,
+            'food': 0
+        }
+
+        # Temporizador
+        self.start_time = pygame.time.get_ticks()
+        self.timer = 60  # Segundos
+
+    def draw_text(self, text, font, color, x, y):
+        textobj = font.render(text, 1, color)
+        textrect = textobj.get_rect(topleft=(x, y))
+        self.display_surface.blit(textobj, textrect)
+
     def get_player_position(self):
         return self.player.x, self.player.y
 
@@ -123,6 +116,7 @@ class Level:
         self.sprites_visiveis.drawn(self.player)
         self.sprites_visiveis.update()
         self.check_collectibles()
+        self.update_timer()
         self.win()
 
     def create_map(self):
@@ -711,19 +705,35 @@ class Level:
         drink_collected = pygame.sprite.spritecollide(self.player, self.drinks, True)
         food_collected = pygame.sprite.spritecollide(self.player, self.food, True)
 
+        font = pygame.font.Font(None, 36)
+        
+        if food_collected:
+            self.collected_items['food'] += 1
+            text = f"Comida: {self.collected_items['food']}"
+            self.draw_text(text, font, BLACK, 10, 10)
+            self.timer += 10
         if drink_collected:
             self.player.speed += 1
+            self.collected_items['drinks'] += 1
+            text = f"Bebida: {self.collected_items['drinks']}"
+            self.draw_text(text, font, BLACK, 10, 10)
         
-        if piece_collected and len(self.collectibles) == 0:
-            # Todos os pedaços coletados, mostrar o cartão completo
-            self.full_card.add(self.sprites_visiveis)
-            self.full_card.rect.topleft = (1136, 2380)
+        if piece_collected:
+            self.collected_items['pieces'] += 1
+            text = f"Cartões: {self.collected_items['pieces']}"
+            self.draw_text(text, font, BLACK, 10, 10)
+            if len(self.collectibles) == 0:
+                # Todos os pedaços coletados, mostrar o cartão completo
+                self.full_card.add(self.sprites_visiveis)
+                self.full_card.rect.topleft = (1136, 2380)
+
         
         # Verificar colisão com o cartão completo
         if self.full_card in self.sprites_visiveis and pygame.sprite.collide_rect(self.player, self.full_card):
             self.full_card.kill()
             full_card_collected = True
             self.update_catraca()
+            
     
     def update_catraca(self):
         layout_objetos_gameplay = import_csv_layout('../assets/map/OBJETOS_Gameplay.csv')
@@ -739,6 +749,54 @@ class Level:
                             objeto_sprite = self.get_sprite('Catraca_aberta')
                             Tile((x, y), [self.sprites_visiveis], objeto_sprite)
     
+    def update_timer(self):
+        elapsed_time = (pygame.time.get_ticks() - self.start_time) / 1000
+        self.timer = max(0, self.timer - elapsed_time)
+        self.start_time = pygame.time.get_ticks()
+        if self.timer <= 0:
+            self.display_game_over_screen()
+    
+
+    def display_game_over_screen(self):
+        pygame.init()
+        font = pygame.font.Font(None, 74)
+        text = font.render("GAME OVER", True, (255, 255, 255))
+        text_rect = text.get_rect(center=(LARGURA // 2, ALTURA // 2))
+        
+        while True:
+            self.display_surface.fill((0, 0, 0))
+            self.display_surface.blit(text, text_rect)
+            pygame.display.flip()
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.quit()
+                        sys.exit()
+        
+    def display_win_screen(self):
+        pygame.init()
+        font = pygame.font.Font(None, 74)
+        text = font.render("WIN", True, (255, 255, 255))
+        text_rect = text.get_rect(center=(LARGURA // 2, ALTURA // 2))
+
+        while True:
+            self.display_surface.fill((0, 0, 0))
+            self.display_surface.blit(text, text_rect)
+            pygame.display.flip()
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.quit()
+                        sys.exit()
+
     
     def win(self):
         player_position = self.player.rect.topleft
@@ -747,5 +805,5 @@ class Level:
         # Verifica se o cartão completo foi coletado e a posição do jogador
         if full_card_collected:
             if ((1212 <= x <= 1283 and y == 3205) or (x == 387 and y == 315)):
-                display_win_screen()
+                self.display_win_screen()
                 

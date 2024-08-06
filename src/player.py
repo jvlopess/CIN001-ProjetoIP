@@ -1,14 +1,10 @@
 import pygame
-
-LARGURA = 1280          # 1280
-ALTURA = 720            # 720
-FPS = 60                # 60
-ESCALA = 2              # 2
-TILESIZE = 16 * ESCALA  # 16 * ESCALA
+from settings import *
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, groups, sprites_obstaculos):
         super().__init__(groups)
+        
         # A imagem de todas as possiveis posições do player (spritesheet)
         self.full_image = pygame.image.load("../assets/gameplay/Personagem.png").convert_alpha()
         
@@ -32,7 +28,7 @@ class Player(pygame.sprite.Sprite):
             'run_down_left': [(64, 32), (192, 32)],
             'run_down_right': [(96, 32), (224, 32)]
         }
-
+        
         self.current_direction = 'idle_down'
         self.current_frame = 0
         self.image = self.get_sprite(self.current_direction, self.current_frame)
@@ -42,7 +38,7 @@ class Player(pygame.sprite.Sprite):
 
         self.direction = pygame.math.Vector2()
         
-        # Velocidade do player
+        # Velocidade 2o player
         self.speed = 2 * ESCALA
 
         self.sprites_obstaculos = sprites_obstaculos

@@ -2,17 +2,9 @@ import pygame
 import sys
 from level import Level
 from PIL import Image, ImageFilter
+from settings import *
 
-LARGURA = 1280          # 1280
-ALTURA = 720            # 720
-FPS = 60                # 60
-ESCALA = 2              # 2
-TILESIZE = 16 * ESCALA  # 16 * ESCALA
-
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-
-
+YELLOW = (255, 255, 0)
 
 class Game:
     def __init__(self):
@@ -42,10 +34,17 @@ class Game:
             self.screen.fill('white')
             self.level.run()
             
-            # Pegando as coordenadas do personagem
-            player_pos = self.level.player.rect.topleft
-            coords_text = f"Coordenadas: {player_pos[0]}, {player_pos[1]}"
-            self.draw_text(coords_text, font, BLACK, 10, 10)
+            # Desenhar a quantidade de itens coletados
+            x_offset = LARGURA - 120
+            y_offset = 10
+            spacing = 40
+            for item, count in self.level.collected_items.items():
+                self.draw_text(f"{item.capitalize()}: {count}", font, YELLOW, x_offset, y_offset)
+                y_offset += spacing
+            
+            # Desenhar o temporizador
+            timer_text = f"Time: {int(self.level.timer)}"
+            self.draw_text(timer_text, font, YELLOW, x_offset, y_offset + spacing)
             
             pygame.display.update()
             self.clock.tick(FPS)
