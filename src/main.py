@@ -10,9 +10,14 @@ class Game:
     def __init__(self):
         pygame.init()
         self.screen = pygame.display.set_mode((LARGURA, ALTURA), pygame.FULLSCREEN)
-        pygame.display.set_caption('Projeto IP')
+        pygame.display.set_caption('FRAGM')
         self.clock = pygame.time.Clock()
         self.level = Level()
+
+        # Carregar e tocar música de fundo
+        pygame.mixer.music.load("../assets/gameplay/sounds/fundo.mp3")
+        pygame.mixer.music.set_volume(0.5)  # Ajustar o volume se necessário
+        pygame.mixer.music.play(-1)  # Tocar em loop
     
     def draw_text(self, text, font, color, x, y):
         textobj = font.render(text, 1, color)
@@ -60,7 +65,8 @@ def main_menu():
     font = pygame.font.Font(None, 74)
     
     # Carregar a imagem de fundo e aplicar desfoque
-    background_image = apply_blur('../assets/tilemap/Mapa.png')
+    # background_image = apply_blur('../assets/tilemap/Mapa.png')
+    background_image = pygame.image.load("../assets/gameplay/FRAGMENTADO.png").convert_alpha()
     background_image = pygame.transform.scale(background_image, (LARGURA, ALTURA))
     
     options = ["START", "ABOUT", "QUIT"]
@@ -71,13 +77,13 @@ def main_menu():
         
         mx, my = pygame.mouse.get_pos()
 
-        start_y = ALTURA // 2 - 50
+        start_y = ALTURA // 2 + 50  # Reposiciona o menu mais para baixo
         spacing = 60
         
         for i, option in enumerate(options):
             if i == selected_option:
-                game.draw_text(">", font, WHITE, LARGURA // 2 - 150, start_y + i * spacing)
-            game.draw_text(option, font, WHITE, LARGURA // 2, start_y + i * spacing)
+                game.draw_text(">", font, WHITE, LARGURA // 2 - 130, start_y + i * spacing)  # Aproxima a setinha dos textos
+            game.draw_text(option, font, WHITE, LARGURA // 2 - 100, start_y + i * spacing)  # Ajusta a posição dos textos
 
         click = False
         for event in pygame.event.get():
@@ -103,6 +109,7 @@ def main_menu():
 
         pygame.display.update()
         game.clock.tick(FPS)
+
 
 if __name__ == '__main__':
     main_menu()

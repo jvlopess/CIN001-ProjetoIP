@@ -1,7 +1,7 @@
 import pygame
 from tile import Tile
 from player import Player
-from enemy import Enemy
+# from enemy import Enemy
 from random import choice
 from csv import reader
 import sys
@@ -82,7 +82,7 @@ class Level:
         self.drinks = pygame.sprite.Group()
         self.food = pygame.sprite.Group()
         self.player = Player((600 * ESCALA, 1520 * ESCALA), [self.sprites_visiveis], self.sprites_obstaculos)
-        self.enemy = Enemy((640 * ESCALA, 1520 * ESCALA), [self.sprites_visiveis], self.sprites_obstaculos, self.player)
+        # self.enemy = Enemy((640 * ESCALA, 1520 * ESCALA), [self.sprites_visiveis], self.sprites_obstaculos, self.player)
 
         self.create_map()
         self.load_collectibles()
@@ -710,18 +710,26 @@ class Level:
         if food_collected:
             self.collected_items['food'] += 1
             text = f"Comida: {self.collected_items['food']}"
+            self.food_sound = pygame.mixer.Sound("../assets/gameplay/sounds/time.mp3")
+            self.food_sound.play() 
             self.draw_text(text, font, BLACK, 10, 10)
             self.timer += 10
+
         if drink_collected:
             self.player.speed += 1
             self.collected_items['drinks'] += 1
             text = f"Bebida: {self.collected_items['drinks']}"
             self.draw_text(text, font, BLACK, 10, 10)
+            self.food_sound = pygame.mixer.Sound("../assets/gameplay/sounds/velocidade.wav")
+            self.food_sound.play() 
         
         if piece_collected:
             self.collected_items['pieces'] += 1
             text = f"Cartões: {self.collected_items['pieces']}"
             self.draw_text(text, font, BLACK, 10, 10)
+            self.food_sound = pygame.mixer.Sound("../assets/gameplay/sounds/efeito_botao.wav")
+            self.food_sound.play() 
+
             if len(self.collectibles) == 0:
                 # Todos os pedaços coletados, mostrar o cartão completo
                 self.full_card.add(self.sprites_visiveis)
@@ -759,15 +767,20 @@ class Level:
 
     def display_game_over_screen(self):
         pygame.init()
-        font = pygame.font.Font(None, 74)
-        text = font.render("GAME OVER", True, (255, 255, 255))
-        text_rect = text.get_rect(center=(LARGURA // 2, ALTURA // 2))
-        
+
+        # Carregar a imagem de game over
+        game_over_image = pygame.image.load("../assets/gameplay/GAME-OVER.png").convert_alpha()
+        image_rect = game_over_image.get_rect(center=(LARGURA // 2, ALTURA // 2))
+
+        # Carregar o som de game over
+        pygame.mixer.music.load("../assets/gameplay/sounds/death.mp3")
+        pygame.mixer.music.play()
+
         while True:
             self.display_surface.fill((0, 0, 0))
-            self.display_surface.blit(text, text_rect)
+            self.display_surface.blit(game_over_image, image_rect)
             pygame.display.flip()
-            
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -776,16 +789,22 @@ class Level:
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
                         sys.exit()
+
         
     def display_win_screen(self):
         pygame.init()
-        font = pygame.font.Font(None, 74)
-        text = font.render("WIN", True, (255, 255, 255))
-        text_rect = text.get_rect(center=(LARGURA // 2, ALTURA // 2))
+
+        # Carregar a imagem de game over
+        game_over_image = pygame.image.load("../assets/gameplay/WINNER.png").convert_alpha()
+        image_rect = game_over_image.get_rect(center=(LARGURA // 2, ALTURA // 2))
+
+        # Carregar o som de game over
+        pygame.mixer.music.load("../assets/gameplay/sounds/winner.mp3")
+        pygame.mixer.music.play()
 
         while True:
             self.display_surface.fill((0, 0, 0))
-            self.display_surface.blit(text, text_rect)
+            self.display_surface.blit(game_over_image, image_rect)
             pygame.display.flip()
 
             for event in pygame.event.get():
