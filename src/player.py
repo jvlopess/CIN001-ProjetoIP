@@ -1,4 +1,5 @@
 import pygame
+import time 
 from settings import *
 
 class Player(pygame.sprite.Sprite):
@@ -40,6 +41,8 @@ class Player(pygame.sprite.Sprite):
         
         # Velocidade 2o player
         self.speed = 2 * ESCALA
+        self.original_speed = self.speed
+        self.speed_boost_end_time = None
 
         self.sprites_obstaculos = sprites_obstaculos
 
@@ -119,6 +122,15 @@ class Player(pygame.sprite.Sprite):
             # Alternar entre os dois frames disponíveis
             self.current_frame = (self.current_frame + 1) % 2
             self.image = self.get_sprite(self.current_direction, self.current_frame)
+
+        # Checando se o tempo expirou
+        if self.speed_boost_end_time and time.time() > self.speed_boost_end_time:
+            self.speed = self.original_speed
+            self.speed_boost_end_time = None
+    
+    def apply_speed_boost(self, duration):
+        self.speed += 1
+        self.speed_boost_end_time = time.time() + duration
     
     def move(self, speed):
         if self.direction.magnitude() != 0: #caso o player vá em alguma direção AS, AD, WA ou WD, a velocidade não seja maior do que devia.

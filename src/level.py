@@ -713,7 +713,7 @@ class Level:
             self.draw_text(text, font, BLACK, 10, 10)
             self.timer += 10
         if drink_collected:
-            self.player.speed += 1
+            self.player.apply_speed_boost(10)
             self.collected_items['drinks'] += 1
             text = f"Bebida: {self.collected_items['drinks']}"
             self.draw_text(text, font, BLACK, 10, 10)
