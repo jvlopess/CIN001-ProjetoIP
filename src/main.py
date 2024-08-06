@@ -5,6 +5,7 @@ from PIL import Image, ImageFilter
 from settings import *
 
 YELLOW = (255, 255, 0)
+WHITE = (255, 255, 255)
 
 class Game:
     def __init__(self):
@@ -35,6 +36,8 @@ class Game:
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
                         sys.exit()
+                    elif event.key == pygame.K_p:
+                        take_screenshot(self.screen)
             
             self.screen.fill('white')
             self.level.run()
@@ -54,10 +57,37 @@ class Game:
             pygame.display.update()
             self.clock.tick(FPS)
 
+def take_screenshot(screen):
+    screenshot = pygame.Surface(screen.get_size())
+    screenshot.blit(screen, (0, 0))
+    pygame.image.save(screenshot, f"screenshot_{pygame.time.get_ticks()}.png")
+
 def apply_blur(image_path, blur_radius=10):
     image = Image.open(image_path)
     blurred_image = image.filter(ImageFilter.GaussianBlur(blur_radius))
     return pygame.image.fromstring(blurred_image.tobytes(), blurred_image.size, blurred_image.mode)
+
+def about_screen(game):
+    font = pygame.font.Font(None, 74)
+    
+    # Carregar a imagem de fundo para a tela "ABOUT"
+    about_image = pygame.image.load("../assets/gameplay/about.png").convert_alpha()
+    about_image = pygame.transform.scale(about_image, (LARGURA, ALTURA))
+    
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return  # Volta ao menu principal
+
+        game.screen.blit(about_image, (0, 0))
+        game.draw_text("Pressione ESC para voltar", font, WHITE, LARGURA // 2 - 200, ALTURA - 100)
+        
+        pygame.display.update()
+        game.clock.tick(FPS)
 
 def main_menu():
     click = False
@@ -65,7 +95,6 @@ def main_menu():
     font = pygame.font.Font(None, 74)
     
     # Carregar a imagem de fundo e aplicar desfoque
-    # background_image = apply_blur('../assets/tilemap/Mapa.png')
     background_image = pygame.image.load("../assets/gameplay/FRAGMENTADO.png").convert_alpha()
     background_image = pygame.transform.scale(background_image, (LARGURA, ALTURA))
     
@@ -99,17 +128,18 @@ def main_menu():
                     if options[selected_option] == "START":
                         game.run()
                     elif options[selected_option] == "ABOUT":
-                        print("About the Game")
+                        about_screen(game)
                     elif options[selected_option] == "QUIT":
                         pygame.quit()
                         sys.exit()
+                elif event.key == pygame.K_p:
+                    take_screenshot(game.screen)
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True
 
         pygame.display.update()
         game.clock.tick(FPS)
-
 
 if __name__ == '__main__':
     main_menu()
