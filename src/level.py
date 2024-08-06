@@ -55,7 +55,7 @@ class Collectible(pygame.sprite.Sprite):
         self.hitbox = self.rect.inflate(0, 0)
 
 class CameraGroup(pygame.sprite.Group):
-    def __init__(self, sprites_acima_do_player):
+    def __init__(self, sprites_acima_do_player, sprites_abaixo_do_player):
         super().__init__()
         self.display_surface = pygame.display.get_surface()
         self.half_width = self.display_surface.get_size()[0] // 2
@@ -63,6 +63,7 @@ class CameraGroup(pygame.sprite.Group):
         self.offset = pygame.math.Vector2()
 
         self.sprites_acima_do_player = sprites_acima_do_player
+        self.sprites_abaixo_do_player = sprites_abaixo_do_player
 
         # criando o Piso utilizando a imagem do tilemap
         self.floor_surf = pygame.image.load('../assets/tilemap/Piso.png').convert()
@@ -76,6 +77,11 @@ class CameraGroup(pygame.sprite.Group):
         # Desenhando o Piso z
         floor_offset_pos = self.floor_rect.topleft - self.offset
         self.display_surface.blit(self.floor_surf, floor_offset_pos)
+
+        # Desenhando os sprites abaixo do player
+        for sprite in self.sprites_abaixo_do_player:
+            offset_pos = sprite.rect.topleft - self.offset
+            self.display_surface.blit(sprite.image, offset_pos)
 
         # Desenhando todos os sprites na ordem de sua posição Y
         for sprite in sorted(self.sprites(), key=lambda sprite: sprite.rect.centery):
@@ -91,9 +97,9 @@ class Level:
     def __init__(self):
         self.display_surface = pygame.display.get_surface()
         self.sprites_acima_do_player = pygame.sprite.Group()
-        self.sprites_visiveis = CameraGroup(self.sprites_acima_do_player)
-        self.sprites_obstaculos = pygame.sprite.Group()
         self.sprites_abaixo_do_player = pygame.sprite.Group()
+        self.sprites_visiveis = CameraGroup(self.sprites_acima_do_player, self.sprites_abaixo_do_player)
+        self.sprites_obstaculos = pygame.sprite.Group()
         self.collectibles = pygame.sprite.Group()
         self.drinks = pygame.sprite.Group()
         self.food = pygame.sprite.Group()
@@ -448,28 +454,28 @@ class Level:
                                 Tile((x, y), [self.sprites_visiveis, self.sprites_obstaculos], objeto_sprite)
                             elif col == '301':
                                 objeto_sprite = self.get_sprite('tv_direita')
-                                Tile((x, y), [self.sprites_visiveis, self.sprites_obstaculos], objeto_sprite)
+                                Tile((x, y), [self.sprites_visiveis], objeto_sprite)
                             elif col == '300':
                                 objeto_sprite = self.get_sprite('tv_esquerda')
-                                Tile((x, y), [self.sprites_visiveis, self.sprites_obstaculos], objeto_sprite)
+                                Tile((x, y), [self.sprites_visiveis], objeto_sprite)
                             elif col == '314':
                                 objeto_sprite = self.get_sprite('tv_direita_baixo')
-                                Tile((x, y), [self.sprites_visiveis, self.sprites_obstaculos], objeto_sprite, 0, -15.9, 0)
+                                Tile((x, y), [self.sprites_abaixo_do_player], objeto_sprite, 0, -15.9, 0)
                             elif col == '313':
                                 objeto_sprite = self.get_sprite('tv_esquerda_baixo')
-                                Tile((x, y), [self.sprites_visiveis, self.sprites_obstaculos], objeto_sprite, 0, -15.9, 0)
+                                Tile((x, y), [self.sprites_abaixo_do_player], objeto_sprite, 0, -15.9, 0)
                             elif col == '303':
                                 objeto_sprite = self.get_sprite('tv_2_direita')
-                                Tile((x, y), [self.sprites_visiveis, self.sprites_obstaculos], objeto_sprite)
+                                Tile((x, y), [self.sprites_visiveis], objeto_sprite)
                             elif col == '302':
                                 objeto_sprite = self.get_sprite('tv_2_esquerda')
-                                Tile((x, y), [self.sprites_visiveis, self.sprites_obstaculos], objeto_sprite)
+                                Tile((x, y), [self.sprites_visiveis], objeto_sprite)
                             elif col == '316':
                                 objeto_sprite = self.get_sprite('tv_2_direita_baixo')
-                                Tile((x, y), [self.sprites_visiveis, self.sprites_obstaculos], objeto_sprite, 0, -15.9, 0)
+                                Tile((x, y), [self.sprites_abaixo_do_player], objeto_sprite, 0, -15.9, 0)
                             elif col == '315':
                                 objeto_sprite = self.get_sprite('tv_2_esquerda_baixo')
-                                Tile((x, y), [self.sprites_visiveis, self.sprites_obstaculos], objeto_sprite, 0, -15.9, 0)
+                                Tile((x, y), [self.sprites_abaixo_do_player], objeto_sprite, 0, -15.9, 0)
                             elif col == '183':
                                 objeto_sprite = self.get_sprite('mesa_quina_cima_esquerda')
                                 Tile((x, y), [self.sprites_visiveis, self.sprites_obstaculos], objeto_sprite)
@@ -563,7 +569,7 @@ class Level:
                             elif col == '144':
                                 y = y + (4 * ESCALA)
                                 objeto_sprite = self.get_sprite('geladeira_baixo')
-                                Tile((x, y), [self.sprites_visiveis, self.sprites_obstaculos], objeto_sprite)
+                                Tile((x, y), [self.sprites_abaixo_do_player], objeto_sprite)
                             elif col == '164' or col == '166':
                                 objeto_sprite = self.get_sprite('mesa_pia_baixo')
                                 Tile((x, y), [self.sprites_visiveis, self.sprites_obstaculos], objeto_sprite)
@@ -646,16 +652,16 @@ class Level:
                                 Tile((x, y), [self.sprites_visiveis, self.sprites_obstaculos], objeto_sprite)
                             elif col == '17':
                                 objeto_sprite = self.get_sprite('porta_madeira_esquerda_cima')
-                                Tile((x, y), [self.sprites_visiveis, self.sprites_obstaculos], objeto_sprite)
+                                Tile((x, y), [ self.sprites_acima_do_player], objeto_sprite)
                             elif col == '18':
                                 objeto_sprite = self.get_sprite('porta_madeira_direita_cima')
-                                Tile((x, y), [self.sprites_visiveis, self.sprites_obstaculos], objeto_sprite)
+                                Tile((x, y), [ self.sprites_acima_do_player], objeto_sprite)
                             elif col == '30':
                                 objeto_sprite = self.get_sprite('porta_madeira_esquerda_baixo')
-                                Tile((x, y), [self.sprites_visiveis, self.sprites_obstaculos], objeto_sprite)
+                                Tile((x, y), [ self.sprites_acima_do_player], objeto_sprite)
                             elif col == '31':
                                 objeto_sprite = self.get_sprite('porta_madeira_direita_baixo')
-                                Tile((x, y), [self.sprites_visiveis, self.sprites_obstaculos], objeto_sprite)
+                                Tile((x, y), [ self.sprites_acima_do_player], objeto_sprite)
                         elif style == 'objetos_Gameplay':
                             x += 192 * ESCALA
                             y += 144 * ESCALA

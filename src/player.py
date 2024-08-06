@@ -43,7 +43,7 @@ class Player(pygame.sprite.Sprite):
         self.direction = pygame.math.Vector2()
         
         # Velocidade do player
-        self.speed = 5 * ESCALA
+        self.speed = 2 * ESCALA
 
         self.sprites_obstaculos = sprites_obstaculos
 
