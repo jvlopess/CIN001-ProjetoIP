@@ -12,6 +12,8 @@ TILESIZE = 16 * ESCALA  # 16 * ESCALA
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
+
+
 class Game:
     def __init__(self):
         pygame.init()

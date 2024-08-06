@@ -4,6 +4,32 @@ from player import Player
 from enemy import Enemy
 from random import choice
 from csv import reader
+import sys
+
+full_card_collected = False
+
+
+def display_win_screen():
+    pygame.init()
+    screen = pygame.display.set_mode((LARGURA, ALTURA))
+    font = pygame.font.Font(None, 74)
+    text = font.render("WIN", True, (255, 255, 255))
+    text_rect = text.get_rect(center=(LARGURA // 2, ALTURA // 2))
+    
+    while True:
+        screen.fill((0, 0, 0))
+        screen.blit(text, text_rect)
+        pygame.display.flip()
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    sys.exit()
+
 
 def import_csv_layout(path):
     mapa = []
@@ -89,6 +115,7 @@ class Level:
         self.sprites_visiveis.drawn(self.player)
         self.sprites_visiveis.update()
         self.check_collectibles()
+        self.win()
 
     def create_map(self):
 
@@ -227,6 +254,9 @@ class Level:
             'mesa_ping_pong_direita_meio': (32, 304),
             'mesa_ping_pong_esquerda_baixo': (16, 320),
             'mesa_ping_pong_direita_baixo': (32, 320),
+
+            'Catraca_fechada': (16, 0),
+            'Catraca_aberta': (0, 0)
         }
 
         layout = {
@@ -624,7 +654,15 @@ class Level:
                             elif col == '31':
                                 objeto_sprite = self.get_sprite('porta_madeira_direita_baixo')
                                 Tile((x, y), [self.sprites_visiveis, self.sprites_obstaculos], objeto_sprite)
+                        elif style == 'objetos_Gameplay':
+                            x += 192 * ESCALA
+                            y += 144 * ESCALA
+                            self.image = pygame.image.load("../assets/gameplay/Catracas.png").convert_alpha()
+                            if col == '1':
+                                    objeto_sprite = self.get_sprite('Catraca_fechada')
+                                    Tile((x, y), [self.sprites_visiveis, self.sprites_obstaculos], objeto_sprite)
 
+                                
     def load_collectibles(self):
         pieces_image = pygame.image.load("../assets/gameplay/Cartao.png").convert_alpha()
         pieces = [
@@ -644,9 +682,41 @@ class Level:
         self.full_card.kill()  # Esconder o cartão completo inicialmente
 
     def check_collectibles(self):
+        global full_card_collected
         collected = pygame.sprite.spritecollide(self.player, self.collectibles, True)
         if collected:
             if len(self.collectibles) == 0:
                 # Todos os pedaços coletados, mostrar o cartão completo
                 self.full_card.add(self.sprites_visiveis)
                 self.full_card.rect.topleft = (1136, 2380)
+        
+        # Verificar colisão com o cartão completo
+        if self.full_card in self.sprites_visiveis and pygame.sprite.collide_rect(self.player, self.full_card):
+            self.full_card.kill()
+            full_card_collected = True
+            self.update_catraca()
+    
+    def update_catraca(self):
+        layout_objetos_gameplay = import_csv_layout('../assets/map/OBJETOS_Gameplay.csv')
+        for row_index, row in enumerate(layout_objetos_gameplay):
+            for col_index, col in enumerate(row):
+                if col != '-1':
+                    x = (col_index * TILESIZE) + (192 * ESCALA)
+                    y = (row_index * TILESIZE) + (144 * ESCALA)
+
+                    self.image = pygame.image.load("../assets/gameplay/Catracas.png").convert_alpha()
+                    if col == '1':
+                        if full_card_collected:
+                            objeto_sprite = self.get_sprite('Catraca_aberta')
+                            Tile((x, y), [self.sprites_visiveis], objeto_sprite)
+    
+    
+    def win(self):
+        player_position = self.player.rect.topleft
+        x, y = player_position
+
+        # Verifica se o cartão completo foi coletado e a posição do jogador
+        if full_card_collected:
+            if ((1212 <= x <= 1283 and y == 3205) or (x == 387 and y == 315)):
+                display_win_screen()
+                
