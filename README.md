@@ -1,4 +1,4 @@
-# **🎮 Título do Projeto**
+# **🎮 Fragmentado**
 
 ## 👥 Equipe
 - **Andreywid Souza** - ayls@cin.ufpe.br
@@ -12,46 +12,47 @@
 ## 1. 📖 Visão Geral
 
 ### 1.1. Descrição
-Uma breve descrição do projeto, explicando o objetivo do jogo e as principais funcionalidades.
+Fragmentado consiste em um jogo 2D no qual o jogador controla um aluno que perdeu seu crachá no CIn. O objetivo do jogador é encontrar os fragmentos do crachá perdido, recuperar o cartão e passar por uma catraca antes que o tempo acabe e o aluno fique preso no prédio. Ademais, estão espalhados pelo CIn hambúrgueres que, quando consumidos, adicionam tempo no cronômetro e latas de energético que aumentam a velocidade do personagem por um período, auxiliando assim o aluno a alcançar seu objetivo.
 
 ---
 
 ## 2. 🛠 Arquitetura do Projeto
 
 ### 2.1. Estrutura de Diretórios
-(exemplos)
+Duas pastas principais:
+
+- **assets:** pasta contendo todas as imagens e arquivos para sprites e sons do jogo.
+- **src:** pasta contendo toda a parte funcional do jogo.
 
 ```plaintext
 ├── assets/
-│   ├── images/
-│   ├── sounds/
+│   ├── gameplay/
+│   ├── map/
+│   ├── screenshots/
+│   ├── tilemap/
 ├── src/
-│   ├── __init__.py
+│   ├── level.py
 │   ├── main.py
-│   ├── settings.py
 │   ├── player.py
-│   ├── enemy.py
-│   ├── game.py
+│   ├── settings.py
+│   ├── tile.py
 ├── README.md
-├── requirements.txt
 ```
 
 ### 2.2. Descrição dos Arquivos
-(exemplos)
-- **main.py**: Ponto de entrada do jogo.
-- **settings.py**: Configurações globais do jogo (e.g., tamanho da tela, FPS).
+- **level.py**: Quase tudo relacionado ao level, coltavéis, etc.
+- **main.py**: Ponto de entrada do jogo; class Game que gerencia o loop principal do jogo.
 - **player.py**: Classe Player, que gerencia as ações do jogador.
-- **enemy.py**: Classe Enemy, que gerencia os comportamentos dos inimigos.
-- **game.py**: Classe Game, que integra todos os componentes e gerencia o loop principal do jogo.
+- **settings.py**: Configurações globais do jogo (e.g., tamanho da tela, FPS).
 - **assets/**: Contém todos os recursos do jogo, como imagens e sons.
 
 ## 3. 📸 Capturas de Tela
 
 ### 3.1. Tela Inicial
-![Tela Inicial](assets/screenshots/tela_inicial.png)
+![Tela Inicial](CIN001-ProjetoIP/assets/screenshots/tela-inicial.png)
 
 ### 3.2. Gameplay
-![Gameplay](assets/screenshots/gameplay.png)
+![Gameplay](CIN001-ProjetoIP/assets/screenshots/screenshot_59425.png)
 
 ## 4. 🛠 Ferramentas, Bibliotecas e Frameworks
 
@@ -60,27 +61,26 @@ Uma breve descrição do projeto, explicando o objetivo do jogo e as principais 
 - **Pygame**: Biblioteca utilizada para criação de jogos 2D.
 
 ### 4.2. Justificativas
-- **Python**: Escolha baseada na sua simplicidade e na relevância para iniciantes em programação.
+- **Python**: Como foi exigido, o projeto todo foi feito em Python.
 - **Pygame**: Popularidade e facilidade de uso para desenvolvimento de jogos simples.
 
 ## 5. 🧑‍💻 Divisão de Trabalho
 
 ### 5.1. Tarefas e Responsáveis
-- **Nome do Membro 1**: 'Andreywid Souza'
-- **Nome do Membro 2**: 'Jadiael Gadelha'
-- **Nome do Membro 3**: 'João Victor Lopes'
-- **Nome do Membro 4**: 'Mário Teles'
-- **Nome do Membro 5**: 'Victor Diniz'
+- **Andreywid e Jadiael - Desenvolvimento do Core do Jogo:** Implementação da lógica principal do jogo, incluindo o movimento do personagem e a coleta de cartões.
+- **Andreywid - Design de Personagens e Cenários:** Criação e importação dos sprites para o jogador, mapa e os coletáveis.
+- **Todos - Mecânicas de Jogo:** Implementação de colisões, itens coletáveis e condições de vitória/derrota.
+- **João Victor - Interface de Usuário:** Design dos menus, telas de início e de fim de jogo.
+- **Victor e Mário - Teste e Depuração:** Identificação e correção de bugs, otimização do desempenho.
+- **Todos - Coordenação e Revisões:** Revisão de código e integração das contribuições individuais no GitHub.
 
 ## 6. 🧠 Conceitos Utilizados
 
 ### 6.1. Programação Orientada a Objetos (OOP)
-- **Classes e Objetos**: Implementação das classes `Player`, `Enemy` e `Game`.
-- **Herança**: Se aplicável, mencione onde foi usada.
+- **Classes e Objetos**: Implementação das classes `Player`, `Level`, `Game`, `Collectible`, `CameraGroup` e `Tile`.
 
 ### 6.2. Estruturas de Dados
-- **Listas**: Utilizadas para gerenciar múltiplos inimigos.
-- **Dicionários**: Se aplicável, descreva seu uso.
+- **Listas**: Utilizadas para gerenciar coletáveis.
 
 ### 6.3. Tratamento de Eventos
 - **Eventos do Pygame**: Controle de entradas do usuário e eventos do jogo.
@@ -88,7 +88,13 @@ Uma breve descrição do projeto, explicando o objetivo do jogo e as principais 
 ## 7. 🚧 Desafios e Lições Aprendidas
 
 ### 7.1. Desafios Enfrentados 
-(exemplos)
+- **Movimentação e Colisão:** Ajustar a movimentação dos personagens e a detecção de colisões.
+- **Desempenho:** Garantir que o jogo funcione suavemente sem atrasos ou travamentos.
+- **Integração de Som:** Sincronizar sons com eventos do jogo sem causar atrasos.
+- **Gerenciamento de Memória:** Prevenir vazamentos de memória e otimizar o uso de recursos.
+- **Teste em Diferentes Máquinas:** Garantir que o jogo funcione corretamente em diferentes configurações de hardware.
+- **Merge de Código:** Resolver conflitos ao integrar contribuições de diferentes membros da equipe.
+- **Interface de Usuário:** Criar uma interface intuitiva para o usuário.
 
 #### 7.1.1. Maior Erro Cometido
 - **Erro**: Inicialmente, não organizamos bem a estrutura do projeto.
@@ -144,5 +150,3 @@ Exemplos:
 - Você precisa adicionar, refatorar ou remover uma funcionalidade: `git branch feature/create-new-button-component`
 - Você precisa corrigir um bug: `git branch bugfix/button-overlap-form-on-mobile`
 - Você precisa experimentar algo: `git branch test/refactor-components-with-atomic-design`
-
-
