@@ -49,10 +49,13 @@ Duas pastas principais:
 ## 3. 📸 Capturas de Tela
 
 ### 3.1. Tela Inicial
-![Tela Inicial](CIN001-ProjetoIP/assets/screenshots/tela-inicial.png)
+<img src="/assets/sreenshots/tela-inicial.png">
 
 ### 3.2. Gameplay
-![Gameplay](CIN001-ProjetoIP/assets/screenshots/screenshot_59425.png)
+<img src="/assets/sreenshots/screenshot_59425.png">
+
+### 3.3. Collectibles
+<img src="/assets/sreenshots/screenshot_11597.png">
 
 ## 4. 🛠 Ferramentas, Bibliotecas e Frameworks
 
